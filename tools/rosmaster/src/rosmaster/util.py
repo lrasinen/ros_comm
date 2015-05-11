@@ -58,6 +58,7 @@ def xmlrpcapi(uri):
         return None
     if not uri in _proxies:
         _proxies[uri] = ServerProxy(uri)
+    print "proxies", len(_proxies), "uri", uri
     return _proxies[uri]
 
 
