@@ -45,6 +45,9 @@ try:
 except ImportError:
     from xmlrpclib import ServerProxy
 
+from threading import Lock
+_lock = Lock()
+
 _proxies = {} #cache ServerProxys
 def xmlrpcapi(uri):
     """
@@ -58,6 +61,17 @@ def xmlrpcapi(uri):
         return None
     if not uri in _proxies:
         _proxies[uri] = ServerProxy(uri)
+    with _lock:
+        print "proxies", len(_proxies), "uri", uri
+        for uri, proxy in _proxies.items():
+            fd = None
+            # httplib.HTTPConnection or None
+            c = proxy("transport")._connection[1]
+            if c:
+                sock = c.sock
+                if sock:
+                    fd = sock.fileno()
+            print "uri %s, fd %s" % (uri, fd)
     return _proxies[uri]
 
 
